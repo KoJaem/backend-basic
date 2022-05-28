@@ -65,6 +65,14 @@ app.post("/update-database", function (req, res) {
   res.send("값 수정이 정상적으로 완료되었습니다.");
 });
 
+// 글 삭제
+app.post("/delete-database", function (req, res) {
+  const id = req.body.id;
+  // splice 메소드 : 어떤 값을 삭제하고 싶은 시작 지점 인덱스부터 n개를 삭제해주는 메소드
+  database.splice(id - 1, 1);
+  res.send("값 삭제가 정상적으로 완료되었습니다.");
+});
+
 app.listen(3000, () => {
   console.log("server on!");
 });
