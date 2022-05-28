@@ -2,7 +2,7 @@ const express = require("express");
 const app = express();
 
 const database = [
-  { id: 1, title: "글1" },
+  { id: 1, title: "글1" }, // database[0]
   { id: 2, title: "글2" },
   { id: 3, title: "글3" },
 ];
@@ -21,12 +21,16 @@ app.get("/database", function (req, res) {
   res.send(database);
 });
 
+// 특정 id 글 요청
 app.get("/database/:id", function (req, res) {
   // req 로 받아온 id 는 String 이므로 Number 로 바꿔줘야함
   const id = req.params.id;
   const data = database.find(el => el.id === Number(id));
   res.send(data);
 });
+
+
+
 
 // params 를 통해 글 추가(요청)를 받는방법 (많이 사용하지는 않음.)
 // : 을 쓰고 뒤에 어떤값(지금은 title)을적으면
@@ -51,6 +55,14 @@ app.post("/add-database", function (req, res) {
     title,
   });
   res.send("값 추가가 정상적으로 완료되었습니다.");
+});
+
+// 글 수정
+app.post("/update-database", function (req, res) {
+  const id = req.body.id;
+  const title = req.body.title;
+  database[id-1].title = title;
+  res.send("값 수정이 정상적으로 완료되었습니다.");
 });
 
 app.listen(3000, () => {
