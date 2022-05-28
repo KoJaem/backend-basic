@@ -1,13 +1,49 @@
 const express = require("express");
 const app = express();
 
+const database = [
+  { id: 1, title: "글1" },
+  { id: 2, title: "글2" },
+  { id: 3, title: "글3" },
+];
 
+// bodyParser
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
 
 // http://localhost:3000
-// render 라는걸 사용할 수도 있는데 이건
-// ejs, pug 등의 키워드를 검색해서 나중에 공부해보면 좋다고 함.
+// Todo ejs pug
 app.get("/", function (req, res) {
-  res.sendFile(__dirname + '/views/index.html');
+  res.sendFile(__dirname + "/views/index.html");
+});
+
+app.get("/database", function (req, res) {
+  res.send(database);
+});
+
+// params 를 통해 글 추가(요청)를 받는방법 (많이 사용하지는 않음.)
+// : 을 쓰고 뒤에 어떤값(지금은 title)을적으면
+// : 뒤에 있는 url 은 title 로 보겠다 라는 뜻임.
+app.get("/database/:title", function (req, res) {
+  const title = req.params.title;
+  database.push({
+    id: database.length + 1,
+    title,
+  });
+  res.send("값 추가가 정상적으로 완료되었습니다.");
+});
+
+// ★ body 를 통해 글 추가(요청)를 받는방법
+// get 메소드 (X) / post 메소드 (O)
+// body 에 담아오는거를 읽어오려면
+// bodyParser 라는것을 express 에 추가해줘야함. (위쪽에 있음)
+app.post("/add-database", function (req, res) {
+  const title = req.body.title;
+  database.push({
+    id: database.length + 1,
+    title,
+  });
+  res.send("값 추가가 정상적으로 완료되었습니다.");
 });
 
 app.listen(3000, () => {
