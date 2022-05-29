@@ -44,15 +44,15 @@ app.post("/login", async (req, res) => {
     return user.username === username;
   });
   if (user.length === 0) {
-    res.send("해당하는 id가 없습니다. ");
+    res.status(403).send("해당하는 id가 없습니다. "); // FORBIDDEN
     return;
   }
 
   // username 이 중복이 되지않는다는 가정하에 user[0] 사용
   // argon2.verify 는 맞으면 true, 틀리면 false 가 나오기 때문에
   // 패스워드가 틀리다고 res.send 를 보낼거면 ! 를 붙여줘야함.
-  if(!(await argon2.verify(user[0].password, password))) {
-    res.send("패스워드가 틀립니다.");
+  if (!(await argon2.verify(user[0].password, password))) {
+    res.status(403).send("패스워드가 틀립니다."); // FORBIDDEN
     return;
   }
 
