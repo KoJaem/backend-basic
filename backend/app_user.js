@@ -1,4 +1,5 @@
 const express = require("express");
+const argon2 = require("argon2");
 const app = express();
 
 const database = [
@@ -23,11 +24,13 @@ app.get("/users", (req, res) => {
 });
 
 // 회원가입
-app.post("/signup", (req, res) => {
+app.post("/signup", async (req, res) => {
+  // 패스워드 abc -> 암호화 -> sadjgkljzxb
   const { username, password, age, birthday } = req.body;
+  const hash = await argon2.hash(password);
   database.push({
     username,
-    password,
+    password: hash,
     age,
     birthday,
   });
@@ -35,7 +38,7 @@ app.post("/signup", (req, res) => {
 });
 
 // 로그인 코드
-app.post("/login", (req, res) => {
+app.post("/login", async (req, res) => {
   const { username, password } = req.body;
   const user = database.filter(user => {
     return user.username === username;
@@ -46,7 +49,9 @@ app.post("/login", (req, res) => {
   }
 
   // username 이 중복이 되지않는다는 가정하에 user[0] 사용
-  if (user[0].password !== password) {
+  // argon2.verify 는 맞으면 true, 틀리면 false 가 나오기 때문에
+  // 패스워드가 틀리다고 res.send 를 보낼거면 ! 를 붙여줘야함.
+  if(!(await argon2.verify(user[0].password, password))) {
     res.send("패스워드가 틀립니다.");
     return;
   }
