@@ -1,22 +1,14 @@
 const express = require("express");
 const argon2 = require("argon2");
+const jwt = require("jsonwebtoken");
+const cookieParser = require("cookie-parser");
+const { validUser } = require("./middleware/auth");
+const database = require("./database");
 const app = express();
 
-const database = [
-  {
-    id: 1,
-    username: "abc",
-    password: "abc",
-  },
-];
-
-// bodyParser
 app.use(express.json());
+app.use(cookieParser());
 app.use(express.urlencoded({ extended: false }));
-
-app.get("/test", (req, res) => {
-  res.send("test");
-});
 
 // 테스트용 코드(원래는 이런게 있으면 안됨!)
 app.get("/users", (req, res) => {
@@ -56,8 +48,21 @@ app.post("/login", async (req, res) => {
     return;
   }
 
+  const access_token = jwt.sign({ username }, "secure"); // username 을 토큰화 시킴
+  res.cookie("access_token", access_token, {
+    httpOnly: true,
+  });
+
   res.send("로그인 성공!");
 });
+
+app.get("/secure_data", validUser, (req, res) => {
+  res.send("인증된 사용자만 쓸 수 있는 API 성공!");
+});
+
+app.get('/new_secure_data', validUser, (req, res) => {
+  res.send('인증된 사용자만 쓸 수 있음');
+})
 
 app.listen(3000, () => {
   console.log("server on!");
